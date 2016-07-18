@@ -4,7 +4,7 @@ shinyUI(
     tabsetPanel(
       tabPanel(
         #### SECTION: Define ####
-        title = '1. Define',
+        title = 'Define',
         fluidRow(
           #### Selectors ####
           column(4,
@@ -14,10 +14,10 @@ shinyUI(
                                unique(as.character(df$gen_comb))))
           ),
           column(4,
-                 selectInput("fourfold",
-                             "Four fold increase since last result:",
+                 selectInput("prev",
+                             "Change since Prveious Result:",
                              c("All",
-                               unique(as.character(df$fourfold))))
+                               unique(as.character(df$prev))))
           ),
           column(4,
                  selectInput("test",
@@ -33,13 +33,13 @@ shinyUI(
           HTML('<h4>Reactor Grid</h4><br>Number of Verified Cases/Number of Lab Reports')
         ),
         fluidRow(
-          column(8,
+          column(9,
                  DT::dataTableOutput("table", height=13)
           ),
         
         #### Dynamic Calculations ####  
         
-          column(4,
+          column(3,
                  fluidRow(
                    htmlOutput('totals')
                  ),
@@ -90,6 +90,12 @@ shinyUI(
                               ),
                        column(4,
                               actionButton('delete.btn', 'Delete Selected'))
+                     )
+                   ),
+                   tabPanel(
+                     title = "Additional Metrics",
+                     fluidRow(
+                       DT::dataTableOutput('addl')
                      )
                    ),
                    #### TAB: Graph ####

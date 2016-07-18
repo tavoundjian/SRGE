@@ -11,8 +11,8 @@ shinyServer(function(input, output, session) {
 #     if (input$gender != "All") {
 #       df <<- df[df$gen_comb == input$gender,]
 #     }
-#     if (input$fourfold != "All") {
-#       df <<- df[df$fourfold == input$fourfold,]
+#     if (input$prev != "All") {
+#       df <<- df[df$prev == input$prev,]
 #     }
 #     if (input$test != "All") {
 #       df <<- df[df$test == input$test,]
@@ -22,12 +22,12 @@ shinyServer(function(input, output, session) {
   #### Render Grid ####
   output$table <- renderDataTable(datatable({
     df <- df
-    
+
     if (input$gender != "All") {
       df <- df[df$gen_comb == input$gender,]
     }
-    if (input$fourfold != "All") {
-      df<- df[df$fourfold == input$fourfold,]
+    if (input$prev != "All") {
+      df<- df[df$prev == input$prev,]
     }
     if (input$test != "All") {
       df <- df[df$test == input$test,]
@@ -49,6 +49,8 @@ shinyServer(function(input, output, session) {
     
     display <- suppressMessages(full_join(display, cases))
     
+    assign('dis.long',display,envir=.GlobalEnv)
+    
     display2 <- display
     display2$p.case <- display2$cases/display2$Freq
     ifelse(is.nan(display2$p.case) == T, 0,display2$p.case) -> display2$p.case
@@ -63,18 +65,19 @@ shinyServer(function(input, output, session) {
     
     display <- display[,c(-2)]
     
-    names(display2)[2:13] <- paste0('p.',names(display2)[2:13])
+    names(display2)[-1] <- paste0('p.',names(display2)[-1])
     full_join(display, display2, "agegrp5") -> display3
     
-    brks <- quantile(display3[,c(14:25)], probs = seq(.40, .95, .05), na.rm = TRUE)
+    brks <- quantile(display3[,c(14:length(names(display3)))], probs = seq(.40, .95, .05), na.rm = TRUE)
     rev(heat_hcl(length(brks)+1)) -> my_palette
     assign('my_palette',my_palette, envir=.GlobalEnv)
     
     assign('display', display, envir = .GlobalEnv)
     
     display3
-  }, options=list(pageLength = 13, columnDefs = list(list(targets = 14:25, visible = FALSE))),
-  selection = list(target = 'cell')) %>% formatStyle(names(display3)[2:13], names(display3)[14:25],
+  },extensions = 'Scroller', options=list(scrollY = 445, scroller = TRUE, 2, pageLength = 12, dom='ti', 
+                                          columnDefs = list(list(targets = 14:25, visible = FALSE))),
+  selection = list(target = 'cell')) %>% formatStyle(names(display3)[2:13], names(display3)[14:length(names(display3))],
                                                      backgroundColor = styleInterval(brks, my_palette))
   )
   
@@ -119,8 +122,8 @@ shinyServer(function(input, output, session) {
     if (input$gender != "All") {
       df <- df[df$gen_comb == input$gender,]
     }
-    if (input$fourfold != "All") {
-      df<- df[df$fourfold == input$fourfold,]
+    if (input$prev != "All") {
+      df<- df[df$prev == input$prev,]
     }
     if (input$test != "All") {
       df <- df[df$test == input$test,]
@@ -146,8 +149,8 @@ shinyServer(function(input, output, session) {
     if (input$gender != "All") {
       df <- df[df$gen_comb == input$gender,]
     }
-    if (input$fourfold != "All") {
-      df<- df[df$fourfold == input$fourfold,]
+    if (input$prev != "All") {
+      df<- df[df$prev == input$prev,]
     }
     if (input$test != "All") {
       df <- df[df$test == input$test,]
@@ -167,6 +170,32 @@ shinyServer(function(input, output, session) {
     names(cases)[3] <- "cases"
     
     df <- suppressMessages(full_join(df2, cases))
+    
+    df.full <- df.full
+    
+    if (input$gender != "All") {
+      df.full <- df.full[df.full$gen_comb == input$gender,]
+    }
+    if (input$prev != "All") {
+      df.full<- df.full[df.full$prev == input$prev,]
+    }
+    if (input$test != "All") {
+      df.full <- df.full[df.full$test == input$test,]
+    }
+    
+    assign('df.chk', df.full, envir=.GlobalEnv)
+    
+    df.full %>%
+      group_by(agegrp5, testresult) %>%
+      summarise(.,
+                N_IndexTx = sum(n_indextx, na.rm=T),
+                N_NewSyphDx = sum(n_newsyphdx, na.rm=T),
+                N_NewSyphTx = sum(n_newsyphtx, na.rm=T),
+                N_NewHIVDx = sum(n_newhivdx, na.rm=T)) -> df.full2
+    
+    factor(df.full2$testresult, levels=levels(dis.long$testresult)) -> df.full2$testresult
+    
+    full_join(df.full2,dis.long, by=c("agegrp5","testresult")) -> df.full3
     
     if(length(selected) > 0) {
       
@@ -250,20 +279,42 @@ shinyServer(function(input, output, session) {
       #Save data frame for display later
       data.frame(
         Gender = input$gender,
-        Fourfold = input$fourfold,
+        prev = input$prev,
         Test = input$test,
         Labs = selected.labs,
         Cases = selected.cases,
-        Loss = paste0(signif(pct.cases.lost*100,3),'%'),
-        Gain = paste0(signif(efficiency.gained*100,3),'%'),
+        Loss = signif(pct.cases.lost,3),
+        Gain = signif(efficiency.gained,3),
         NNT = signif(lab.reports.per.case,3),
         Eff.Ratio = signif(eff.index,3),
         selected = e,
         selection = paste(selected, collapse=",")
       ) ->> save.df
-      
       assign('save.df',save.df, envir = .GlobalEnv)
-
+      
+      full.selected <- data.frame()
+      for(i in 1:nrow(selected)) {
+        row <- df.full3[df.full3$testresult == names(display)[[selected[i,2]]] & df.full3$agegrp5 == display[selected[i,1],1],]
+        
+        rbind(full.selected, row) -> full.selected
+      }
+      
+      full.selected %>%
+        ungroup() %>%
+        summarise(.,N_IndexTx = sum(N_IndexTx,na.rm=T),
+                  N_NewSyphDx = sum(N_NewSyphTx,na.rm=T),
+                  N_NewHIVDx = sum(N_NewHIVDx,na.rm=T),
+                  Labs = sum(Freq,na.rm=T),
+                  Cases = sum(cases,na.rm=T)) -> full.selected2
+      
+      
+      names(full.selected2) <- c("Index Cases Treated", "Partners: New Cases of Syphilis",
+                               "Partners: HIV Case Finding","Labs","Cases")
+      
+      full.selected2$selected <- save.df$selected
+      assign('full.selected2',full.selected2, envir=.GlobalEnv)
+      
+      
       paste0(
         '<b>Selected Labs: </b>', selected.labs
       ) -> str.sl
@@ -302,8 +353,8 @@ shinyServer(function(input, output, session) {
     if (input$gender != "All") {
       df <- df[df$gen_comb == input$gender,]
     }
-    if (input$fourfold != "All") {
-      df<- df[df$fourfold == input$fourfold,]
+    if (input$prev != "All") {
+      df<- df[df$prev == input$prev,]
     }
     if (input$test != "All") {
       df <- df[df$test == input$test,]
@@ -375,7 +426,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-#   #### Saved Algorithm Table ####
+#   #### Save Button ####
 #   output$save <- DT::renderDataTable(datatable({
 #     d <- display.save.df
 #     if (length(d) == 0) {
@@ -404,6 +455,7 @@ shinyServer(function(input, output, session) {
     
     if (length(selected) > 0) {
       
+      #### RG Metrics ####
       save.df <- save.df
       
       if (length(display.save.df) == 0) {
@@ -412,9 +464,20 @@ shinyServer(function(input, output, session) {
         rbind(display.save.df, save.df) -> display.save.df
       }
       assign('display.save.df',display.save.df, envir = .GlobalEnv)
+      
+      #### Treatment and Partners Metrics ####
+      df.selected2 <- full.selected2
+      
+      if (length(df.addl) == 0) {
+        df.addl <- df.selected2
+      }      else if (length(df.addl) > 0) {
+        rbind(df.addl, df.selected2) -> df.addl
+      }
+      assign('df.addl',df.addl, envir = .GlobalEnv)
     }
   })
   
+  #### Delete Button ####
   observeEvent(input$delete.btn, {
     selected2 <- NULL
     selected2 <- input$save_rows_selected
@@ -433,7 +496,7 @@ shinyServer(function(input, output, session) {
     if(length(selected2) > 0) {
       d <- display.save.df[1:nrow(display.save.df) %in% selected2,]
       d$Gender <- as.character(d$Gender)
-      d$Fourfold <- as.character(d$Fourfold)
+      d$prev <- as.character(d$prev)
       d$Test <- as.character(d$Test)
       
       d$Loss %>%
@@ -467,7 +530,7 @@ shinyServer(function(input, output, session) {
                    as.character(d[,2]) == 'All' & 
                    as.character(d[,3]) == 'All'),]
         
-        comb.err <<- paste("Ignored rows for Overall algorithms (where Gender, Fourfold and Test = All)")
+        comb.warn <<- paste("Ignored rows for Overall algorithms (where Gender, Change since previous result, and Test = All)")
       
         
       
@@ -487,6 +550,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  #### Evaluate: Main Output Table ####
   output$save <- DT::renderDataTable(datatable({
     selected <- NULL
     selected <- selected
@@ -508,31 +572,52 @@ shinyServer(function(input, output, session) {
        input$combine.btn) {
       unique(display.save.df[,c(-11)]) 
     }
-  },selection = list(target = 'row'), escape = c(9), options = list(searchable = F))
-  )
+  },selection = list(target = 'row'), escape = c(9),
+  extensions = 'Scroller', options = list(dom = 't',
+                                          scrollY = 600,
+                                          scroller = TRUE, 2)
+  ))
+  
+  #### Additional Metrics Display ####
+  output$addl <- DT::renderDataTable(datatable({
+    selected <- NULL
+    selected <- selected
+    
+    if (length(selected) > 0) {
+      
+      df.selected2 <- full.selected2
+      
+      if (length(df.addl) == 0) {
+        df.addl <- df.selected2
+      }      else if (length(df.addl) > 0) {
+        rbind(df.addl, df.selected2) -> df.addl
+      }
+      assign('df.addl',df.addl, envir = .GlobalEnv)
+    } 
+    
+    if(input$save.btn|
+       input$delete.btn|
+       input$combine.btn) {
+      unique(df.addl) 
+    }
+  },selection = list(target = 'row'), escape = c(6),
+  extensions = 'Scroller', options = list(dom = 't',
+                                          scrollY = 600,
+                                          scroller = TRUE, 2)
+  ))
   
   #### Plot Window ####
   output$plot <- renderPlot({
     
     a <- display.save.df
     
-    a$Loss %>%
-      as.character(.) %>%
-      substr(1,(nchar(.)-1)) %>%
-      as.numeric(.) -> a$Loss
-    
-    a$Gain %>%
-      as.character(.) %>%
-      substr(1,(nchar(.)-1)) %>%
-      as.numeric(.) -> a$Gain
-    
     if(input$save.btn) {
       i <- ggplot(a, aes(Loss, Gain))
       
       ggplot(a, aes(Loss, Gain)) +
-        geom_point(aes(colour = as.factor(rownames(a))), size=4) +
+        geom_point(aes(colour = as.factor(row.names(a)))) +
         #geom_abline(intercept = 0, slope = 1) +
-        coord_cartesian(xlim=c(0,max(a$Gain)+1),ylim=c(0,max(a$Gain)+1)) + 
+        coord_cartesian(xlim=c(0,max(a$Loss)+.1),ylim=c(0,max(a$Gain)+.1)) + 
         facet_grid(Test ~ Gender)
     }
   })
