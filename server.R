@@ -751,26 +751,34 @@ shinyServer(function(input, output, session) {
   # }
   # )
   
-  savegrid <- reactive({
+  saveg <- reactive({
     gData <- filedata2()
-    if (is.null(gData)) return(NULL)
-
-    write.csv(gData, "stacked.csv")
+    if (is.null(gData)) return(data.frame())
+    
+    return(gData)
+    # write.csv(gData, "stacked.csv")
   })
   
-  # output$savegrid <- downloadHandler(
-  #   filename = function() { 
-  #     paste(input$dataset, '.csv', sep='') 
-  #   },
+  # output$saveGrid <- downloadHandler(
+  #   
+  #   filename = 'SRGEOutput.csv',
   #   content = function(file) {
-  #     write.csv(datasetInput(), file)
+  #     write.csv(stacked, file)
   #   }
   # )
   
+  output$SaveGrid <- downloadHandler(
+    filename = 'SRGEOutput.csv',
+    content = function(con) {
+      
+      write.csv(saveg(), file=con)
+    }
+  )
+  
   # observeEvent(input$SaveGrid, {
-  #   
+  # 
   #   savegrid()
-  #   
+  # 
   #   session$sendCustomMessage(type = 'testmessage',
   #                             message = 'Data File Saved')
   # })
@@ -889,7 +897,7 @@ shinyServer(function(input, output, session) {
     
     display3
   },extensions = 'Scroller', options=list(scrollY = 445, scroller = TRUE, 2, pageLength = 12, dom='ti',
-                                          columnDefs = list(list(targets = 9:15, visible = FALSE))),
+                                          columnDefs = list(list(targets = brk.int, visible = FALSE))),
   selection = list(target = 'cell')) %>% formatStyle(names(display3)[2:(brk.start-1)],
                                                      names(display3[,brk.int]),
                                                      backgroundColor = styleInterval(brks, my_palette))

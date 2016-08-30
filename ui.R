@@ -84,7 +84,7 @@ shinyUI(
                      ),
                      fluidRow(
                        column(6,
-                              actionButton("SaveGrid","Save Data File")
+                              downloadButton("SaveGrid","Save Data File")
                               ),
                        column(6,
                               actionButton("createGrid", "Create Grid")

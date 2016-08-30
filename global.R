@@ -22,6 +22,8 @@ library(ggplot2)
 
 rev(heat_hcl(length(seq(.40,.95,.05))+1)) -> my_palette
 assign('my_palette',my_palette, envir=.GlobalEnv)
+brk.int <- NULL
+
 
 # library(dplyr)
 # library(tidyr)
