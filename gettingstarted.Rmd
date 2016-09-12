@@ -1,0 +1,31 @@
+---
+title: "Welcom to SRGE"
+output: html_document
+---
+
+# Welcome to the Syphilis Reactor Grid Evaluator. 
+This tool can be used to visualize the syphilis reactor grid and evaluate the impact of user-defined administrative closure algorithms.
+
+## Getting Started
+
+### New Users  
+If this is your first time using SRGE, you must import in syphilis reactor data. Your dataset must be a ".csv" file and should include the following fields:
+  * Case Status
+  * Age 
+  * Test Result
+  * Gender
+  * Test Type
+  * Previous Result  
+  
+If your data set is aggregated, please check the **Aggregated Data?** option and specify the weighting variable.  
+
+### Importing Data  
+1. Use the **New Data** tab on the right to import a new data file.
+2. Click **Choose File** and select the ".csv" file you would like to import (Note: if you are not seeing your file, change your file display to **All Files** instead of **Custom Files**). You can view your imported dataset in the **Data** tab.
+3. Specify the variable names that correspond to each of the fields required for SRGE. Do the same for optional variables. If there are optional variables you are not interested in including, uncheck the **Include?** option to exclude them.
+4. Follow the instructions in the **Case, Age, Test Result, Gender, Test Type,** and **Prev. Result** tabs above to construct the reactor grid data set.
+5. (Optional) Use the **Save Data File** button to save the generated reactor grid data file for later use.
+6. Click Reactor Grid to construct the reactor grid.
+
+### Loading Data
+If you already have a reactor grid data file from a previous evaluation, use the **Load Data** tab to load the previously constructed grid.
