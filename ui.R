@@ -21,7 +21,7 @@ shinyUI(
                      title = "New Data",
                      #Selector for file upload
                      fileInput('datafile', 'Choose CSV file',
-                               accept=c('text/csv', 'text/comma-separated-values,text/plain')),
+                               accept=c("txt/csv", "text/comma-separated-values,text/plain", ".csv")),
                      #These column selectors are dynamically created when the file is loaded
                      fluidRow(
                        uiOutput("req.text")
@@ -94,7 +94,7 @@ shinyUI(
                    tabPanel(
                      title = "Load Data",
                      fileInput('loadfile', 'Choose CSV file',
-                               accept=c('text/csv', 'text/comma-separated-values,text/plain')),
+                               accept=c("txt/csv", "text/comma-separated-values,text/plain", ".csv")),
                      fluidRow(
                        actionButton("LoadGrid", "Load Data File")
                      )
@@ -107,49 +107,87 @@ shinyUI(
                  tabsetPanel(
                    id = "tabs",
                    tabPanel(
+                     title = "Getting Started",
+                     includeMarkdown("gettingstarted.Rmd")
+                   ),
+                   tabPanel(
                      title = "Data",
                      tableOutput("filetable")
                    ),
                    tabPanel(
-                     title = "Case",
+                     title = "Required Fields",
+                     HTML("<h2>Case Status</h2>"),
                      uiOutput("case.panel.title"),
-                     uiOutput("case.panel")
-                   ),
-                   tabPanel(
-                     title = "Age",
+                     uiOutput("case.panel"),
+                     HTML("<h2>Age</h2>"),
                      uiOutput("age.factor.title"),
                      uiOutput("age.factor.inputs"),
                      uiOutput("age.panel.title"),
-                     uiOutput("age.panel")
-                   ),
-                   tabPanel(
-                     title = "Test Result",
+                     uiOutput("age.panel"),
+                     HTML("<h2>Test Result</h2>"),
                      uiOutput("result.factor.title"),
                      uiOutput("result.factor.inputs"),
                      uiOutput("result.panel.title"),
                      uiOutput("result.panel")
                    ),
                    tabPanel(
-                     title = "Gender",
+                     title = "Optional Fields",
+                     HTML("<h2>Gender</h2>"),
                      uiOutput("gender.factor.title"),
                      uiOutput("gender.factor.inputs"),
                      uiOutput("gender.panel.title"),
-                     uiOutput("gender.panel")
-                   ),
-                   tabPanel(
-                     title = "Test Type",
+                     uiOutput("gender.panel"),
+                     HTML("<h2>Test Type</h2>"),
                      uiOutput("type.factor.title"),
                      uiOutput("type.factor.inputs"),
                      uiOutput("type.panel.title"),
-                     uiOutput("type.panel")
-                   ),
-                   tabPanel(
-                     title = "Prev. Result",
+                     uiOutput("type.panel"),
+                     HTML("<h2>Previous Result</h2>"),
                      uiOutput("prev.factor.title"),
                      uiOutput("prev.factor.inputs"),
                      uiOutput("prev.panel.title"),
                      uiOutput("prev.panel")
                    )
+                   # tabPanel(
+                   #   title = "Case",
+                   #   uiOutput("case.panel.title"),
+                   #   uiOutput("case.panel")
+                   # ),
+                   # tabPanel(
+                   #   title = "Age",
+                   #   uiOutput("age.factor.title"),
+                   #   uiOutput("age.factor.inputs"),
+                   #   uiOutput("age.panel.title"),
+                   #   uiOutput("age.panel")
+                   # ),
+                   # tabPanel(
+                   #   title = "Test Result",
+                   #   uiOutput("result.factor.title"),
+                   #   uiOutput("result.factor.inputs"),
+                   #   uiOutput("result.panel.title"),
+                   #   uiOutput("result.panel")
+                   # ),
+                   # tabPanel(
+                   #   title = "Gender",
+                   #   uiOutput("gender.factor.title"),
+                   #   uiOutput("gender.factor.inputs"),
+                   #   uiOutput("gender.panel.title"),
+                   #   uiOutput("gender.panel")
+                   # ),
+                   # tabPanel(
+                   #   title = "Test Type",
+                   #   uiOutput("type.factor.title"),
+                   #   uiOutput("type.factor.inputs"),
+                   #   uiOutput("type.panel.title"),
+                   #   uiOutput("type.panel")
+                   # ),
+                   # tabPanel(
+                   #   title = "Prev. Result",
+                   #   uiOutput("prev.factor.title"),
+                   #   uiOutput("prev.factor.inputs"),
+                   #   uiOutput("prev.panel.title"),
+                   #   uiOutput("prev.panel")
+                   # )
                  )
                )
              )
@@ -219,7 +257,7 @@ shinyUI(
                #### SECTION: Evaluate ####
                title = 'Evaluate',
                fluidRow(
-                 column(8,
+                 column(10,
                         #### Table/Graph Frame ####
                         tabsetPanel(
                           #### TAB: Table ####
@@ -232,10 +270,8 @@ shinyUI(
                             #### Table buttons #####
                             fluidRow(
                               column(4,
-                                     actionButton('combine.btn', 'Combine Selected')
-                              ),
-                              column(4,
-                                     actionButton('delete.btn', 'Delete Selected'))
+                                     actionButton('delete.btn', 'Delete Selected')
+                                     )
                             )
                           ),
                           #### TAB: Graph ####
@@ -248,7 +284,7 @@ shinyUI(
                           )
                         )
                  ),
-                 column(4,
+                 column(2,
                         fluidRow(
                           h4('Final Algorithm')
                         ),
@@ -258,7 +294,7 @@ shinyUI(
                         ),
                         fluidRow(
                           #### Export Button ####
-                          actionButton('export.alg','Export Algorithm')
+                          downloadButton('export.alg','Export Algorithm')
                         )
                  )
                )

@@ -7,7 +7,12 @@ shinyServer(function(input, output, session) {
       # User has not uploaded a file yet
       return(NULL)
     }
-    read.csv(infile$datapath)
+    
+    if(file_ext(infile$name) == "csv") {
+      read.csv(infile$datapath) -> outputdf
+    } else if(file_ext(infile$datapath) == "txt") {
+      read.table(infile$datapath, header=T) -> outputdf
+    } 
   })
   
   fileload <- reactive({
@@ -18,11 +23,19 @@ shinyServer(function(input, output, session) {
     read.csv(lfile$datapath, stringsAsFactors = F) -> load
     
     factor(load$result, levels = unique(load$result)) -> load$result
+    
+    assign('chk.result',length(unique(load$result)), envir=.GlobalEnv)
+    
     factor(load$age, levels = unique(load$age)) -> load$age
     factor(load$gender, levels = unique(load$gender)) -> load$gender
     factor(load$prev, levels = unique(load$prev)) -> load$prev
     factor(load$type, levels = unique(load$type)) -> load$type
     factor(load$case_status, levels = unique(load$case_status)) -> load$case_status
+    
+    brk.start <<- length(unique(load[complete.cases(load[,c("case_status","result","age")]),'result']))+2
+    brk.end <<- (length(unique(load[complete.cases(load[,c("case_status","result","age")]),'result']))*2)+1
+    
+    brk.int <<- brk.start:brk.end
     
     load
   })
@@ -625,38 +638,46 @@ shinyServer(function(input, output, session) {
                             labels = c(f.result))
       }
       
-      if (is.factor(genders) == F &
-          is.character(genders) == F) {
-        v.gender <<- factor(gender.f,
-                            levels = c(f.gender),
-                            labels = c(f.gender))
-      } else {
-        v.gender <<- factor(df[,which(colnames(df) == gender)], 
-                            levels = c(f.gender), 
-                            labels = c(f.gender))
-      }
+      if (exists('genders')) {
+        if (is.factor(genders) == F &
+            is.character(genders) == F) {
+          v.gender <<- factor(gender.f,
+                              levels = c(f.gender),
+                              labels = c(f.gender))
+        } else {
+          v.gender <<- factor(df[,which(colnames(df) == gender)], 
+                              levels = c(f.gender), 
+                              labels = c(f.gender))
+        }  
+      } else v.gender <<- NULL
       
-      if (is.factor(types) == F &
-          is.character(types) == F) {
-        v.type <<- factor(type.f,
-                          levels = c(f.type),
-                          labels = c(f.type))
-      } else {
-        v.type <<- factor(df[,which(colnames(df) == type)],
-                          levels = c(f.type),
-                          labels = c(f.type))
-      }
       
-      if (is.factor(prevs) == F &
-          is.character(prevs) == F) {
-        v.prev <<- factor(prev.f,
-                          levels = c(f.prev),
-                          labels = c(f.prev))
-      } else {
-        v.prev <<- factor(df[,which(colnames(df) == prev)],
-                          levels = c(f.prev),
-                          labels = c(f.prev))
-      }
+      if (exists('types')) {
+        if (is.factor(types) == F &
+            is.character(types) == F) {
+          v.type <<- factor(type.f,
+                            levels = c(f.type),
+                            labels = c(f.type))
+        } else {
+          v.type <<- factor(df[,which(colnames(df) == type)],
+                            levels = c(f.type),
+                            labels = c(f.type))
+        }
+      } else v.type <<- NULL
+      
+      if (exists('prevs')) {
+        if (is.factor(prevs) == F &
+            is.character(prevs) == F) {
+          v.prev <<- factor(prev.f,
+                            levels = c(f.prev),
+                            labels = c(f.prev))
+        } else {
+          v.prev <<- factor(df[,which(colnames(df) == prev)],
+                            levels = c(f.prev),
+                            labels = c(f.prev))
+        }
+      } else v.prev <<- NULL
+      
       
       pre.case <<- df[,which(colnames(df) == case)]
       
@@ -672,9 +693,9 @@ shinyServer(function(input, output, session) {
         rg <<- data.frame(
           age = v.age,
           result = v.result,
-          gender = v.gender,
-          type = v.type,
-          prev = v.prev,
+          gender = if(is.null(v.gender)) NA else v.gender,
+          type = if(is.null(v.type)) NA else v.type,
+          prev = if(is.null(v.prev)) NA else v.prev,
           case_status = v.case,
           freq = v.freq
         )
@@ -682,9 +703,9 @@ shinyServer(function(input, output, session) {
         rg <<- data.frame(
           age = v.age,
           result = v.result,
-          gender = v.gender,
-          type = v.type,
-          prev = v.prev,
+          gender = ifelse(is.null(v.gender),NA,v.gender),
+          type = ifelse(is.null(v.type),NA,v.type),
+          prev = ifelse(is.null(v.prev),NA,v.prev),
           case_status = v.case,
           freq = 1
         )
@@ -717,15 +738,15 @@ shinyServer(function(input, output, session) {
     
     brk.int <<- brk.start:brk.end
     
-    assign('stacked', stacked, envir = .GlobalEnv)
+    assign('stacked', stacked[complete.cases(stacked[,c("case_status","result","age")]),], envir = .GlobalEnv)
     
     } else {
-      brk.start <<- length(unique(load$result))+1
-      brk.end <<- (length(unique(load$result))*2)-1
+      # brk.start <<- length(unique(load$result))+1
+      # brk.end <<- (length(unique(load$result))*2)-1
+      # 
+      # brk.int <<- brk.start:brk.end
       
-      brk.int <<- brk.start:brk.end
-      
-      assign('load',load,envir = .GlobalEnv)
+      assign('load',load[complete.cases(load[,c("case_status","result","age")]),],envir = .GlobalEnv)
     }
     
     #write.table(stacked, "stacked")
@@ -743,13 +764,6 @@ shinyServer(function(input, output, session) {
     # 
     # spread(data, testresult, Cases.Labs) -> data
   })
-  
-  # output$filetable2 <- renderTable({
-  #   rg2 <<- filedata2()
-  #   
-  #   rg2
-  # }
-  # )
   
   saveg <- reactive({
     gData <- filedata2()
@@ -795,7 +809,7 @@ shinyServer(function(input, output, session) {
     if (is.null(load)) {
       df <- filedata2()
       if (is.null(df)) return(NULL)
-      
+      if (!exists('genders')) return(NULL)
       if (is.factor(genders) == F &
           is.character(genders) == F) {
         selectInput("gen.filter", "Gender", c("All",levels(gender.f)))
@@ -814,6 +828,7 @@ shinyServer(function(input, output, session) {
     if (is.null(load)) {
       df <- filedata2()
       if (is.null(df)) return(NULL)
+      if (!exists('prevs')) return(NULL)
       
       if (is.factor(prevs) == F &
           is.character(prevs) == F) {
@@ -833,6 +848,7 @@ shinyServer(function(input, output, session) {
     if (is.null(load)) {
       df <- filedata2()
       if (is.null(df)) return(NULL)
+      if (!exists('types')) return(NULL)
       
       if (is.factor(types) == F &
           is.character(types) == F) {
@@ -850,14 +866,20 @@ shinyServer(function(input, output, session) {
     rg2 <<- filedata2()
     if (is.null(rg2)) return(NULL)
     
-    if (input$gen.filter != "All") {
-      rg2 <- rg2[rg2$gender == input$gen.filter,]
+    if (exists('genders')|exists('loadcheck')) {
+      if (input$gen.filter != "All") {
+        rg2 <- rg2[rg2$gender == input$gen.filter,]
+      }
     }
-    if (input$prev.filter != "All") {
-      rg2<- rg2[rg2$prev == input$prev.filter,]
+    if (exists('prevs')|exists('loadcheck')) {
+      if (input$prev.filter != "All") {
+        rg2<- rg2[rg2$prev == input$prev.filter,]
+      }
     }
-    if (input$test.filter != "All") {
-      rg2 <- rg2[rg2$type == input$test.filter,]
+    if (exists('types')|exists('loadcheck')) {
+      if (input$test.filter != "All") {
+        rg2 <- rg2[rg2$type == input$test.filter,]
+      }
     }
     
     display <- as.data.frame(with(rg2, table(age, result)))
@@ -890,8 +912,8 @@ shinyServer(function(input, output, session) {
     # 
     # brk.int <<- brk.start:brk.end
     
-    brks <- quantile(display3[,brk.int], 
-                     probs = seq(.40, .95, .05), na.rm = TRUE)
+    brks <- quantile(display3[,brk.int],
+                     probs = seq(0, .95, .05), na.rm = TRUE)
     
     assign('display', display, envir = .GlobalEnv)
     
@@ -934,15 +956,23 @@ shinyServer(function(input, output, session) {
     df <- filedata2()
     if (is.null(df)) return(NULL)
     
-    if (input$gen.filter != "All") {
-      df <- df[df$gender == input$gen.filter,]
+    if (exists('genders')|exists('loadcheck')) {
+      if (input$gen.filter != "All") {
+        df <- df[df$gender == input$gen.filter,]
+      }
     }
-    if (input$prev.filter != "All") {
-      df<- df[df$prev == input$prev.filter,]
+    if (exists('prevs')|exists('loadcheck')) {
+      if (input$prev.filter != "All") {
+        df<- df[df$prev == input$prev.filter,]
+      }
     }
-    if (input$test.filter != "All") {
-      df <- df[df$type == input$test.filter,]
+    if (exists('types')|exists('loadcheck')) {
+      if (input$test.filter != "All") {
+        df <- df[df$type == input$test.filter,]
+      }
     }
+    
+    assign('df',df, envir=.GlobalEnv)
     
     nrow(df) ->> total.labs
     nrow(df[df$case_status == 'Case',]) ->> total.cases
@@ -962,14 +992,20 @@ shinyServer(function(input, output, session) {
     df.load <- filedata2()
     if (is.null(df.load)) return(NULL)
     
-    if (input$gen.filter != "All") {
-      df.load <- df.load[df.load$gender == input$gen.filter,]
+    if (exists('genders')|exists('loadcheck')) {
+      if (input$gen.filter != "All") {
+        df.load <- df.load[df.load$gender == input$gen.filter,]
+      }
     }
-    if (input$prev.filter != "All") {
-      df.load<- df.load[df.load$prev == input$prev.filter,]
+    if (exists('prevs')|exists('loadcheck')) {
+      if (input$prev.filter != "All") {
+        df.load<- df.load[df.load$prev == input$prev.filter,]
+      }
     }
-    if (input$test.filter != "All") {
-      df.load <- df.load[df.load$type == input$test.filter,]
+    if (exists('types')|exists('loadcheck')) {
+      if (input$test.filter != "All") {
+        df.load <- df.load[df.load$type == input$test.filter,]
+      }
     }
 
     nrow(df.load) -> total.labs
@@ -1069,9 +1105,9 @@ shinyServer(function(input, output, session) {
       
       #Save data frame for display later
       data.frame(
-        Gender = input$gen.filter,
-        prev = input$prev.filter,
-        Test = input$test.filter,
+        Gender = if(exists('input$gen.filter')|exists('loadcheck')) input$gen.filter else "All",
+        prev = if(exists('input$prev.filter')|exists('loadcheck')) input$prev.filter else "All",
+        Test = if(exists('input$test.filter')|exists('loadcheck')) input$test.filter else "All",
         Labs = selected.labs,
         Cases = selected.cases,
         Loss = signif(pct.cases.lost,3),
@@ -1142,14 +1178,20 @@ shinyServer(function(input, output, session) {
     df.load <- filedata2()
     if (is.null(df.load)) return(NULL)
     
-    if (input$gen.filter != "All") {
-      df.load <- df.load[df.load$gender == input$gen.filter,]
+    if (exists('genders')|exists('loadcheck')) {
+      if (input$gen.filter != "All") {
+        df.load <- df.load[df.load$gender == input$gen.filter,]
+      }
     }
-    if (input$prev.filter != "All") {
-      df.load<- df.load[df.load$prev == input$prev.filter,]
+    if (exists('prevs')|exists('loadcheck')) {
+      if (input$prev.filter != "All") {
+        df.load<- df.load[df.load$prev == input$prev.filter,]
+      }
     }
-    if (input$test.filter != "All") {
-      df.load <- df.load[df.load$type == input$test.filter,]
+    if (exists('types')|exists('loadcheck')) {
+      if (input$test.filter != "All") {
+        df.load <- df.load[df.load$type == input$test.filter,]
+      }
     }
     
     nrow(df.load) -> total.labs
@@ -1265,8 +1307,7 @@ shinyServer(function(input, output, session) {
     }
     
     if(input$save.btn|
-       input$delete.btn|
-       input$combine.btn) {
+       input$delete.btn) {
       unique(display.save.df[,c(-11)]) 
     }
   },selection = list(target = 'row'), escape = c(9),
@@ -1283,13 +1324,22 @@ shinyServer(function(input, output, session) {
     if(input$save.btn) {
       i <- ggplot(a, aes(Loss, Gain))
       
+      
       ggplot(a, aes(Loss, Gain)) +
-        geom_point(aes(colour = as.factor(row.names(a)))) +
-        #geom_abline(intercept = 0, slope = 1) +
+        geom_point(aes(colour = as.factor(row.names(a))),size = 3) +
+        geom_abline(intercept = 0, slope = 1) +
         coord_cartesian(xlim=c(0,max(a$Loss)+.1),ylim=c(0,max(a$Gain)+.1)) + 
         facet_grid(Test ~ Gender)
     }
   })
+  
+  output$export.alg <- downloadHandler(
+    filename = 'SRGEAlgorithmOutput.csv',
+    content = function(con) {
+      
+      write.csv(display.save.df, file=con)
+    }
+  )
   
   # output$prev.panel <- renderUI({
   #   df <- filedata()

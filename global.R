@@ -13,6 +13,7 @@ library(colorspace)
 library(reshape2)
 library(plotrix)
 library(ggplot2)
+library(tools)
 
 
 #new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
@@ -20,7 +21,7 @@ library(ggplot2)
 #lapply(list.of.packages,function(x){library(x,character.only=TRUE)}) 
 
 
-rev(heat_hcl(length(seq(.40,.95,.05))+1)) -> my_palette
+rev(heat_hcl(length(seq(0,.95,.05))+1)) -> my_palette
 assign('my_palette',my_palette, envir=.GlobalEnv)
 brk.int <- NULL
 
