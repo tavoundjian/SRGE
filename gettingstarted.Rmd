@@ -8,6 +8,11 @@ This tool can be used to visualize the syphilis reactor grid and evaluate the im
 
 ## Getting Started
 
+### Demo Dataset
+A demo dataset for testing purposes is [available here](https://raw.githubusercontent.com/tavoundjian/SRGE/master/SRGEDemoData.csv).
+
+Download this data set (to download the dataset, **right click** the link and choose "Save Link...") and use the "Load Data" tab on the left to load the demo data set.
+
 ### New Users  
 If this is your first time using SRGE, you must import in syphilis reactor data. Your dataset must be a **.csv** file and should include the following fields:
   * Case Status
