@@ -703,9 +703,9 @@ shinyServer(function(input, output, session) {
         rg <<- data.frame(
           age = v.age,
           result = v.result,
-          gender = ifelse(is.null(v.gender),NA,v.gender),
-          type = ifelse(is.null(v.type),NA,v.type),
-          prev = ifelse(is.null(v.prev),NA,v.prev),
+          gender = if(is.null(v.gender)) NA else v.gender,
+          type = if(is.null(v.type)) NA else v.type,
+          prev = if(is.null(v.prev)) NA else v.prev,
           case_status = v.case,
           freq = 1
         )
@@ -814,7 +814,7 @@ shinyServer(function(input, output, session) {
           is.character(genders) == F) {
         selectInput("gen.filter", "Gender", c("All",levels(gender.f)))
       } else {
-        selectInput("gen.filter", "Gender", c("All", levels(f.gender)))
+        selectInput("gen.filter", "Gender", c("All", f.gender))
       }
     } else {
       selectInput("gen.filter", "Gender", c("All", levels(loadcheck$gender)))
@@ -868,6 +868,8 @@ shinyServer(function(input, output, session) {
     
     if (exists('genders')|exists('loadcheck')) {
       if (input$gen.filter != "All") {
+        chk <<- input$gen.filter
+        
         rg2 <- rg2[rg2$gender == input$gen.filter,]
       }
     }
@@ -1103,11 +1105,13 @@ shinyServer(function(input, output, session) {
       }
       substr(e, 6,nchar(e)) -> e
       
+      chk <<- exists('genders')|exists('loadcheck')
+      
       #Save data frame for display later
       data.frame(
-        Gender = if(exists('input$gen.filter')|exists('loadcheck')) input$gen.filter else "All",
-        prev = if(exists('input$prev.filter')|exists('loadcheck')) input$prev.filter else "All",
-        Test = if(exists('input$test.filter')|exists('loadcheck')) input$test.filter else "All",
+        Gender = if(exists('genders')|exists('loadcheck')) input$gen.filter else "All",
+        prev = if(exists('prevs')|exists('loadcheck')) input$prev.filter else "All",
+        Test = if(exists('types')|exists('loadcheck')) input$test.filter else "All",
         Labs = selected.labs,
         Cases = selected.cases,
         Loss = signif(pct.cases.lost,3),
