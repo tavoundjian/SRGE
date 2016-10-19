@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="SRGE : A Web Application for Catalyzing Syphilis Reactor Grid Evaluations">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>SRGE</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/tavoundjian/SRGE">View on GitHub</a>
+
+          <h1 id="project_title">SRGE</h1>
+          <h2 id="project_tagline">A Web Application for Catalyzing Syphilis Reactor Grid Evaluations</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/tavoundjian/SRGE/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/tavoundjian/SRGE/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="srge" class="anchor" href="#srge" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>SRGE</h1>
+
+<p>SRGE is a Shiny web application that can be used to visualize the syphilis reactor grid and evaluate the impact of user-defined administrative closure algorithms in real time.</p>
+
+<h2>
+<a id="web-application" class="anchor" href="#web-application" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Web Application</h2>
+
+<p>A web version of the application is available at <a href="https://tavoun.shinyapps.io/SRGE">https://tavoun.shinyapps.io/SRGE</a>. Please email <a href="mailto:tavoun@uw.edu">tavoun@uw.edu</a> if you would like technical assistance to set up a web instance of SRGE.</p>
+
+<h2>
+<a id="local-installation" class="anchor" href="#local-installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Local Installation</h2>
+
+<h3>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h3>
+
+<p>You must have <a href="https://cran.r-project.org/mirrors.html"><strong>R</strong></a> (3.3.0 or later) and <a href="https://www.rstudio.com/products/rstudio/download/"><strong>R Studio</strong></a> (0.99.896 or later) installed in order to run SRGE locally. </p>
+
+<h3>
+<a id="install-required-packages" class="anchor" href="#install-required-packages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install Required Packages</h3>
+
+<p>Once you've installed R and R Studio, run the following code in R Studio to install all required packages:</p>
+
+<pre><code>list.of.packages &lt;- c("shiny", "leaflet", "shinyjs", "dplyr", "tidyr", "colorspace", "reshape2", "plotrix", "ggplot2", "devtools")
+install.packages(list.of.packages)
+
+devtools::install_github('rstudio/DT')
+</code></pre>
+
+<h3>
+<a id="download-files-from-github-repository" class="anchor" href="#download-files-from-github-repository" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Download Files from Github Repository</h3>
+
+<p>To run SRGE locally, download all of the files in this repository to the same local folder. </p>
+
+<h3>
+<a id="run-app" class="anchor" href="#run-app" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run App</h3>
+
+<p>In R Studio, use the following command to run the application:</p>
+
+<pre><code>runApp("C:/Path/to/SRGE/Download/Folder/")
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">SRGE maintained by <a href="https://github.com/tavoundjian">tavoundjian</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
