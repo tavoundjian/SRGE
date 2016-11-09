@@ -13,8 +13,8 @@ You may include the following fields for stratifying the reacotr grid:
   * Previous Result
 
 For more details on the requirements and general guidelines for defining and formatting variables please see the following pages:
-[SRGE Variable Template] (https://raw.githubusercontent.com/tavoundjian/SRGE/master/stacked.csv) 
-[Sample reactor Data] (right click and "Save Link As.." to save a local copy)
+[SRGE Variable Template] (https://tavoundjian.github.io/SRGEDataTemplate/) 
+[Sample reactor Data] (https://raw.githubusercontent.com/tavoundjian/SRGE/master/stacked.csv) (right click and "Save Link As.." to save a local copy)
 
 ## Web Application
 A web version of the application is available at https://tavoun.shinyapps.io/SRGE. Please email tavoun@uw.edu if you would like technical assistance to set up a web instance of SRGE.
