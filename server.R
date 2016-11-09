@@ -683,7 +683,7 @@ shinyServer(function(input, output, session) {
       
       pre.case2 <<- ifelse(pre.case == f.case, 1, 0)
       
-      v.case <<- factor(df[,which(colnames(df) == case)],
+      v.case <<- factor(pre.case2,
                         levels = c(0,1),
                         labels = c("Non-Case","Case"))
       
@@ -870,17 +870,17 @@ shinyServer(function(input, output, session) {
       if (input$gen.filter != "All") {
         chk <<- input$gen.filter
         
-        rg2 <- rg2[rg2$gender == input$gen.filter,]
+        rg2 <- rg2[rg2$gender == input$gen.filter & !(is.na(rg2$gender)),]
       }
     }
     if (exists('prevs')|exists('loadcheck')) {
       if (input$prev.filter != "All") {
-        rg2<- rg2[rg2$prev == input$prev.filter,]
+        rg2<- rg2[rg2$prev == input$prev.filter & !(is.na(rg2$prev)),]
       }
     }
     if (exists('types')|exists('loadcheck')) {
       if (input$test.filter != "All") {
-        rg2 <- rg2[rg2$type == input$test.filter,]
+        rg2 <- rg2[rg2$type == input$test.filter & !(is.na(rg2$type)),]
       }
     }
     
@@ -960,17 +960,17 @@ shinyServer(function(input, output, session) {
     
     if (exists('genders')|exists('loadcheck')) {
       if (input$gen.filter != "All") {
-        df <- df[df$gender == input$gen.filter,]
+        df <- df[df$gender == input$gen.filter & !(is.na(df$gender)),]
       }
     }
     if (exists('prevs')|exists('loadcheck')) {
       if (input$prev.filter != "All") {
-        df<- df[df$prev == input$prev.filter,]
+        df<- df[df$prev == input$prev.filter & !(is.na(df$prev)),]
       }
     }
     if (exists('types')|exists('loadcheck')) {
       if (input$test.filter != "All") {
-        df <- df[df$type == input$test.filter,]
+        df <- df[df$type == input$test.filter & !(is.na(df$type)),]
       }
     }
     
@@ -996,17 +996,17 @@ shinyServer(function(input, output, session) {
     
     if (exists('genders')|exists('loadcheck')) {
       if (input$gen.filter != "All") {
-        df.load <- df.load[df.load$gender == input$gen.filter,]
+        df.load <- df.load[df.load$gender == input$gen.filter & !(is.na(df.load$gender)),]
       }
     }
     if (exists('prevs')|exists('loadcheck')) {
       if (input$prev.filter != "All") {
-        df.load<- df.load[df.load$prev == input$prev.filter,]
+        df.load<- df.load[df.load$prev == input$prev.filter & !(is.na(df.load$prev)),]
       }
     }
     if (exists('types')|exists('loadcheck')) {
       if (input$test.filter != "All") {
-        df.load <- df.load[df.load$type == input$test.filter,]
+        df.load <- df.load[df.load$type == input$test.filter & !(is.na(df.load$type)),]
       }
     }
 
@@ -1184,17 +1184,17 @@ shinyServer(function(input, output, session) {
     
     if (exists('genders')|exists('loadcheck')) {
       if (input$gen.filter != "All") {
-        df.load <- df.load[df.load$gender == input$gen.filter,]
+        df.load <- df.load[df.load$gender == input$gen.filter & !(is.na(df.load$gender)),]
       }
     }
     if (exists('prevs')|exists('loadcheck')) {
       if (input$prev.filter != "All") {
-        df.load<- df.load[df.load$prev == input$prev.filter,]
+        df.load<- df.load[df.load$prev == input$prev.filter & !(is.na(df.load$prev)),]
       }
     }
     if (exists('types')|exists('loadcheck')) {
       if (input$test.filter != "All") {
-        df.load <- df.load[df.load$type == input$test.filter,]
+        df.load <- df.load[df.load$type == input$test.filter & !(is.na(df.load$type)),]
       }
     }
     
