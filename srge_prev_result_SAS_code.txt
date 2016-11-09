@@ -1,0 +1,60 @@
+/*
+Example SAS Code for using lag to compare previous result to current result to identify less than fourfold increases in titer values.
+
+This code is run after setting up data set of all non-treponemal labs and cleaning up titer values. 
+
+Process:
+	Step 1: Order data by patient ID, test date and test result.
+	Step 2: Exclude qualitative test results
+	Step 3: Create variables that lag (i.e., copy the previous value from the previous row to the current row) patientID, test date, and test result.
+	Step 4: If the previous patient ID and current patient ID match, then take the difference between the current test result and the previous test result.
+	Step 5: Use difference to flag lab reports that are less than a 2 titer increase since previous lab.
+
+Key Variables:
+	- c_patientID: Unique patient identifier
+	- testdate: Lab test date
+	- testresult: lab test result
+
+Value labels for Test Result:
+	1	=	'Reactive'
+	2	=	'Non-R'
+	3	=	'1:1'
+	4	=	'1:2'
+	5	=	'1:4'
+	6	=	'1:8'
+	7	=	'1:16'
+	8	=	'1:32'
+	9	=	'1:64'
+	10	=	'1:128'
+	11	=	'1:256'
+	12	=	'1:512'
+	13	=	'1:1024'
+	14	=	'1:2048'
+	15	=	'1:4096'
+	16	=	'1:8192'
+	17	=	'BL'
+	18	=	'NEG' 
+	19	=	'NG'
+	20	=	'POS' 
+	21	=	'QNS'
+	22	=	'Unknown'
+	23	=	'WR'
+	24  =   '1:32+'
+run;
+*/
+
+data rpr_prev;
+	set rpr2;
+	if 3 <= testresult <= 16; *include only quantitative results in comparing previous result. This will need to be merged back to full dataset (make sure prev = 0 for qual results);
+
+	*Lag patientID, test date and test result one row;
+	lagpatientid = lag(c_patientid);
+	lagtestdate = lag(testdate);
+	lagresult = lag(testresult);
+
+	prev = 0; *initialize;
+	if c_patientid = lagpatientid then do;
+		resultdiff = testresult - lagresult;
+		if resultdiff < 2 then prev = 1; *Less than fourfold increase;
+	end;
+run;
