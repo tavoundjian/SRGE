@@ -12,8 +12,8 @@ You may include the following fields for stratifying the reacotr grid:
   * Test Type
   * Previous Result
 
-For more details on the requirements and general guidelines for defining and formatting variables please see the following pages:
-[SRGE Variable Template] (https://tavoundjian.github.io/SRGEDataTemplate/) 
+For more details on the requirements and general guidelines for defining and formatting variables please see the following pages:  
+[SRGE Variable Template] (https://tavoundjian.github.io/SRGEDataTemplate/)   
 [Sample reactor Data] (https://raw.githubusercontent.com/tavoundjian/SRGE/master/stacked.csv) (right click and "Save Link As.." to save a local copy)
 
 ## Web Application
