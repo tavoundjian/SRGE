@@ -1,6 +1,21 @@
 # SRGE
 SRGE is a Shiny web application that can be used to visualize the syphilis reactor grid and evaluate the impact of user-defined administrative closure algorithms in real time.
 
+## Data Set Up
+Your dataset must be a .csv file and should include the following fields:
+  * Case Status
+  * Age
+  * Test Result
+
+You may include the following fields for stratifying the reacotr grid:
+  * Gender
+  * Test Type
+  * Previous Result
+
+For more details on the requirements and general guidelines for defining and formatting variables please see the following pages:
+[SRGE Variable Template] (https://raw.githubusercontent.com/tavoundjian/SRGE/master/stacked.csv) 
+[Sample reactor Data] (right click and "Save Link As.." to save a local copy)
+
 ## Web Application
 A web version of the application is available at https://tavoun.shinyapps.io/SRGE. Please email tavoun@uw.edu if you would like technical assistance to set up a web instance of SRGE.
 
