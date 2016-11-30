@@ -7,7 +7,7 @@ Your dataset must be a .csv file and should include the following fields:
   * Age
   * Test Result
 
-You may include the following fields for stratifying the reacotr grid:
+You may include the following fields for stratifying the reactor grid:
   * Gender
   * Test Type
   * Previous Result
