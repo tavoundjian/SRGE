@@ -1,5 +1,4 @@
-## This is a test comment
-## This is another test
+## This is a third comment
 
 shinyUI(
   navbarPage("SRGE", id="nav",
