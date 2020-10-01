@@ -1,3 +1,6 @@
+## This is a test comment
+## This is another test
+
 shinyUI(
   navbarPage("SRGE", id="nav",
     tabPanel("Data Load",
